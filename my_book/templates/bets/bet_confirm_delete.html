@@ -1,0 +1,150 @@
+{% extends "my_book/base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1>Confirm Bet Deletion</h1>
+    
+    <p>Are you sure you want to delete the following bet?</p>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Bet Amount</th>
+                <th>Payout</th>
+                <th>Bet Type</th>
+                <th colspan="4">Details</th> <!-- 4 columns for maximum of legs -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="table-row">
+                <td class="align-center">{{ bet.player }}</td>
+                <td class="align-center">{{ bet.bet_amount }}</td>
+                <!-- Display Payout -->
+                <td class="align-center">
+                    {% if bet.payout %}
+                        <span
+                         class="{% if bet.payout < 0 %}text-red{% else %}text-green{% endif %}">
+                         {{ bet.payout }}
+                        </span>
+                    {% else %}
+                        <span class="text-yellow">Pending</span>
+                    {% endif %}
+                </td>
+                <td class="align-center">{{ bet_type }}</td>
+
+                <!-- Display Single Bets -->
+                <td>
+                    {% if bet.single_bet1 %}
+                        {{ bet.single_bet1.game }}<br>
+                        {% if bet.single_bet1.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet1.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet1.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet1.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet1.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+                
+                <td>
+                    {% if bet.single_bet2 %}
+                        {{ bet.single_bet2.game }}<br>
+                        {% if bet.single_bet2.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet2.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet2.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet2.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet2.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if bet.single_bet3 %}
+                        {{ bet.single_bet3.game }}<br>
+                        {% if bet.single_bet3.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet3.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet3.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet3.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet3.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if bet.single_bet4 %}
+                        {{ bet.single_bet4.game }}<br>
+                        {% if bet.single_bet4.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet4.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet4.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet4.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet4.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn-secondary-delete">Yes, Delete</button>
+      <a href="{% url 'bet-list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

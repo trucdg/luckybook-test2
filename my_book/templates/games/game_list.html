@@ -1,0 +1,156 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Games List</h1>
+
+    <div class="add-game-btns-div">
+        <a href="{% url 'game-create' %}">Add Game Manually</a>
+        <a href="{% url 'game-search' %}" class="live-search-btn">Live Search Games</a>
+    </div>
+
+    <hr>
+
+    <!-- DEBUG messages in get_game_results_view() -->
+    <!-- {% if messages %}
+    <ul class="messages" style="color: red">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %} -->
+
+    <!-- NFL Games Section -->
+    <div class="games-section">
+        <h2>NFL Games</h2>
+        {% if nfl_games %}
+        
+        <!-- pass 'league' as a query parameter in the URL -->
+        <div class="add-game-btns-div">
+            <a href="{% url 'get-game-results' %}?league=NFL">Get NFL Results</a>
+        </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>A</th>
+                        <th>B</th>
+                        <th>Score A</th>
+                        <th>Score B</th>
+                        <th>Total Score</th>
+                        <th>Finished</th>
+                        <th>Favorite</th>
+                        <th>Spread</th>
+                        <th>Over/ Under</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in nfl_games %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ game.game_date|date:"m/d"|default:"-" }}</td>
+                            <td>
+                                <span class="team-name">{{ game.team_a|default:"-" }}</span> <br>
+                                <img src="{{ game.team_a_logo_url }}" alt="Team A Logo">
+                            </td>
+                            <td>
+                                <span class="team-name">{{ game.team_b|default:"-" }}</span> <br>
+                                <img src="{{ game.team_b_logo_url }}" alt="Team B Logo">
+                            </td>
+                            <td>{{ game.score_team_a|default:"-" }}</td>
+                            <td>{{ game.score_team_b|default:"-" }}</td>
+                            <td>{{ game.total_points|default:"-" }}</td>
+                            <td>
+                                {% if game.is_finished %}
+                                    <span style="color: #48b882">Y</span>
+                                {% else %}
+                                    <span style="color: #ec3c36">N</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-green">{{ game.fav|default:"-" }}</td>
+                            <td class="text-green">{{ game.fav_spread|default:"-" }}</td>
+                            <td>
+                                {% if not game.over_under_points or game.over_under_points == 0.0 %}
+                                <span class="text-red">Missing</span>
+                                {% else %}
+                                <span class="text-green">{{ game.over_under_points}}</span>
+                                {% endif %}
+                            </td>
+                            <td><a href="{% url 'game-edit' game.id %}" class="small-btn">Edit</a></td>
+                            <td><a href="{% url 'game-delete' game.id %}" class="sml-delete-btn">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-games-message">No NFL games available at the moment.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+    <!-- NCAA Games Section -->
+    <div class="games-section">
+        <h2>NCAA Games</h2>
+        {% if ncaa_games %}
+        <div class="add-game-btns-div">
+            <a href="{% url 'get-game-results' %}?league=NCAA">Get NCAA Results</a>
+        </div>
+        <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>A</th>
+                        <th>B</th>
+                        <th>Score A</th>
+                        <th>Score B</th>
+                        <th>Total Score</th>
+                        <th>Finished</th>
+                        <th>Favorite</th>
+                        <th>Spread</th>
+                        <th>Over/ Under</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for game in ncaa_games %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ game.game_date|date:"m/d"|default:"-" }}</td>
+                            <td>
+                                <span class="team-name">{{ game.team_a|default:"-" }}</span> <br>
+                                <img src="{{ game.team_a_logo_url }}" alt="Team A Logo">
+                            </td>
+                            <td>
+                                <span class="team-name">{{ game.team_b|default:"-" }}</span> <br>
+                                <img src="{{ game.team_b_logo_url }}" alt="Team B Logo">
+                            </td>
+                            <td>{{ game.score_team_a|default:"-" }}</td>
+                            <td>{{ game.score_team_b|default:"-" }}</td>
+                            <td>{{ game.total_points|default:"-" }}</td>
+                            <td>
+                                {% if game.is_finished %}
+                                    <span style="color: #48b882">Y</span>
+                                {% else %}
+                                    <span style="color: #ec3c36">N</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-green">{{ game.fav|default:"-" }}</td>
+                            <td class="text-green">{{ game.fav_spread|default:"-" }}</td>
+                            <td class="text-green">{{ game.over_under_points|default:"-" }}</td>
+                            <td><a href="{% url 'game-edit' game.id %}" class="small-btn">Edit</a></td>
+                            <td><a href="{% url 'game-delete' game.id %}" class="sml-delete-btn">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-games-message">No NCAA games available at the moment.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

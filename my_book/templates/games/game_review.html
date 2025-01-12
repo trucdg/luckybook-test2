@@ -1,0 +1,69 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Review Selected Games</h1>
+    <form method="post" action="{% url 'add-reviewed-games' %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Team A</th>
+                    <th>Team B</th>
+                    <th>Status</th>
+                    <th>Score A</th>
+                    <th>Score B</th>
+                    <th>Spread</th>
+                    <th>Over/ Under</th>
+                    <th>Favorite</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                <tr>
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][game_date]" value="{{ game.date }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][league]" value="{{ game.league }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][team_a]" value="{{ game.team_a }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][team_b]" value="{{ game.team_b }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][status]" value="{{ game.status }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][score_team_a]" value="{{ game.score_team_a }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][score_team_b]" value="{{ game.score_team_b }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][team_a_logo_url]" value="{{ game.team_a_logo_url }}">
+                    <input type="hidden" name="games[{{ forloop.counter0 }}][team_b_logo_url]" value="{{ game.team_b_logo_url }}">
+
+                    <td>{{ game.date }} at {{ game.time }}</td>
+                    <td>
+                        <span class="team-name">{{ game.team_a }}</span> <br>
+                        <img src="{{ game.team_a_logo_url }}" alt="Team A Logo">
+                    </td>
+                    <td>
+                        <span class="team-name">{{ game.team_b }}</span> <br>
+                        <img src="{{ game.team_b_logo_url }}" alt="Team B Logo">
+                    </td>
+                    <td>{{ game.status }}</td>
+                    <td>{{ game.score_team_a }}</td>
+                    <td>{{ game.score_team_b }}</td>
+                    <td>
+                        <input type="number" style="width: 70px;" step="0.1" name="games[{{ forloop.counter0 }}][fav_spread]" required>
+                    </td>
+                    <td>
+                        <input type="number" style="width: 70px;" step="0.1" name="games[{{ forloop.counter0 }}][over_under_points]" required>
+                    </td>
+                    <td>
+                        <select name="games[{{ forloop.counter0 }}][fav]" required>
+                            <option value="{{ game.team_a }}">{{ game.team_a }}</option>
+                            <option value="{{ game.team_b }}">{{ game.team_b }}</option>
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: center;">
+            <button type="submit" class="btn-primary">Add Games to Database</button>
+        </div>
+        
+    </form>
+</div>
+{% endblock %}

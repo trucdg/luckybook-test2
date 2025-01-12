@@ -1,0 +1,62 @@
+{% extends "my_book/base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Players</h1>
+
+    <!-- Create Player Form -->
+    <div class="form">
+        <h2>Add Player</h2>
+        <form method="POST" class="form-inline">
+            {% csrf_token %}
+            {{ player_form.as_p }}
+            <button type="submit" class="btn btn-primary">Add Player</button>
+        </form>
+    </div>
+
+    <!-- Player List Table -->
+    <div class="player-list">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Total Bet Money</th>
+                    <th>Total Payout</th>
+                    <th>Straight Bets</th>
+                    <th>Action Bets</th>
+                    <th>Parlay3 Bets</th>
+                    <th>Parlay4 Bets</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td style="text-align: left;">
+                            <a href="{% url 'player-detail' player.pk %}" class="player-name-link">
+                            {{ player.name }}
+                            </a>
+                        </td>
+                        <td style="text-align: right;">{{ player.calculate_total_betting_money }}</td>
+                        <td style="text-align: right;">
+                            <span 
+                                class="{% if player.calculate_total_payout < 0 %}text-red{% else %}text-green{% endif %}">
+                                {{ player.calculate_total_payout }}
+                            </span>
+                        </td>
+                        <td>{{ player.get_straight_bet_count }}</td>
+                        <td>{{ player.get_action_bet_count }}</td>
+                        <td>{{ player.get_parlay3_bet_count }}</td>
+                        <td>{{ player.get_parlay4_bet_count }}</td>
+
+                        <td>
+                            <a href="{% url 'player-edit' player.id %}" class="btn btn-secondary btn-sm">Edit</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

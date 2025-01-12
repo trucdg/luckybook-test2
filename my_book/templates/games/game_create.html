@@ -1,0 +1,17 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="page-title">Add New Game</h1>
+    <div class="form">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary">Save Game</button>
+            <a href="{% url 'game-list' %}" class="btn-secondary">Back to Game List</a>
+        </form>
+    </div>
+    
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Search for Games</h1>
+    <div class="form">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Search Games</button>
+        </form>
+    </div>
+
+    {% if games %}
+    <h2>Games Found</h2>
+    <form method="POST" action="{% url 'game-review' %}">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Stage</th>
+                    <th>Week</th>
+                    <th>Date & Time</th>
+                    <th>Team A</th>
+                    <th>Team B</th>
+                    <th>Status</th>
+                    <th>Score A</th>
+                    <th>Score B</th>
+                    <th>Add</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ game.stage }}</td>
+                        <td>{{ game.week }}</td>
+                        <td>{{ game.date }} at {{ game.time }}</td>
+                        <td>
+                            <span class="team-name">{{ game.team_a }}</span> <br>
+                            <img src="{{ game.team_a_logo_url }}" alt="Team A Logo">
+                        </td>
+                        <td>
+                            <span class="team-name">{{ game.team_b }}</span> <br>
+                            <img src="{{ game.team_b_logo_url }}" alt="Team B Logo">
+                        </td>
+                        <td>{{ game.status }}</td>
+                        <td>{{ game.score_team_a }}</td>
+                        <td>{{ game.score_team_b }}</td>
+                        <td>
+                            {% if game.is_added %}
+                                <button class="small-btn added" disabled>Added</button>
+                            {% else %}
+                                <input type="checkbox" name="selected_games" value="{{ game.json_data }}">
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: center;">
+            <button type="submit" class="btn-primary">Add Selected Games</button>
+        </div>
+        
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

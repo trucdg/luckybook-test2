@@ -1,0 +1,25 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="page-title">Betting Insights</h1>
+
+        <!-- Bets Type Bar Graph -->
+        <div class="graph">
+            <h3>Bet Types Comparition</h3>
+            <div id="bets-type-graph">
+                {{ bets_type_graph|safe }}
+            </div>
+        </div>
+
+
+        <!-- Money/ Payout Pie Graphs -->
+        <div class="graph">
+            <h3>Bet Amount vs Payout for Each Bet Type</h3>
+            <div id="money_payout_graph">
+                {{ money_payout_graph|safe }}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

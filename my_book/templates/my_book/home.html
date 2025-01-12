@@ -1,0 +1,25 @@
+<!--templates/my_book/home.html  -->
+
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+<section class="hero">
+    <h1>Welcome to LuckyBook</h1>
+    <p>Your go-to platform for sports betting. Track games, place bets, and win big!</p>
+    <a href="/games/" class="btn-primary">View Games</a>
+</section>
+<section class="features">
+    <div class="feature">
+        <h3>Live Updates</h3>
+        <p>Get real-time scores and odds for all your favorite games.</p>
+    </div>
+    <div class="feature">
+        <h3>Easy Betting</h3>
+        <p>Place bets with a few clicks and keep track of your history.</p>
+    </div>
+    <div class="feature">
+        <h3>Secure & Reliable</h3>
+        <p>Enjoy a safe and transparent betting experience.</p>
+    </div>
+</section>
+{% endblock %}

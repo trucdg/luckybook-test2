@@ -1,0 +1,12 @@
+{% extends "my_book/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Are you sure you want to delete player: {{ player.name }}?</h2>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-secondary btn-delete">Yes, delete</button>
+    </form>
+    <a href="{% url 'player-detail' player.pk %}" class="btn-primary">Cancel</a>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+<!-- my_book/templates/my_book/logout.html -->
+
+{% extends "my_book/base.html" %}
+
+{% block content %}
+    <div class="container">
+        <div class="logout-box">
+            <h2 class="logout-title">Logout</h2>
+            <h2 class="logout-message">You have been logged out</h2>
+            <p>
+                Return to the login page: 
+                <a href="{% url 'login' %}" class="btn-primary">Login</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,53 @@
+<!--templates/my_book/base.html  -->
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckyBook</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body class="dark-mode">
+    <header>
+        <div class="logo">LuckyBook</div>
+        <nav>
+            <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'game-list' %}">Games</a></li>
+                    <li><a href="{% url 'player-list' %}">Players</a></li>
+                    <li><a href="{% url 'bet-list' %}">Bets</a></li>
+                    <li><a href="{% url 'insights' %}">Insights</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" >
+                            {% csrf_token %}
+                            <button type="submit" style="background-color: #cccbcb; border-radius: 5px;">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'login' %}"> Login </a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h3 style="color: #4a90e2; font-size: 1em; font-weight: 400; 
+        text-align: center; margin: 20px 0; border-bottom: 2px solid #00b894; padding-bottom: 5px; 
+        text-transform: uppercase;text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">
+            {% if request.user.is_authenticated %}
+                {{ request.user }} is logged in.
+            {% else %}
+                Guest User
+            {% endif %}
+        </h3>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>© 2024 LuckyBook. All rights reserved.</p>
+    </footer>
+</body>
+</html>

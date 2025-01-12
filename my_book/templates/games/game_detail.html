@@ -1,0 +1,32 @@
+{% extends 'my_book/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="page-title">{{ game.team_a }} vs {{ game.team_b }}</h1>
+        
+        <div class="game-detail">
+            <!-- Score Display with 2-Column Layout -->
+            <div class="game-scores">
+                <div class="team-score">
+                    <h3>{{ game.team_a }}</h3>
+                    <p><strong>Score:</strong> {{ game.score_team_a|default:"-" }}</p>
+                </div>
+                <div class="team-score">
+                    <h3>{{ game.team_b }}</h3>
+                    <p><strong>Score:</strong> {{ game.score_team_b|default:"-" }}</p>
+                </div>
+            </div>
+
+            <!-- Other Information -->
+            <div class="game-info">
+                <p><strong>Date:</strong> {{ game.game_date|date:"m/d"|default:"-" }}</p>
+                <p><strong>Favorite Team:</strong> {{ game.fav|default:"-" }}</p>
+                <p><strong>Spread:</strong> {{ game.fav_spread|default:"-" }}</p>
+                <p><strong>Over/Under Points:</strong> {{ game.over_under_points|default:"-" }}</p>
+            </div>
+        </div>
+
+        <!-- Edit Button -->
+        <a href="{% url 'game-edit' game.id %}" class="btn-primary">Edit Game</a>
+    </div>
+{% endblock %}

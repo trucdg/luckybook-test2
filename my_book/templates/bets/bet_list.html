@@ -1,0 +1,415 @@
+{% extends "my_book/base.html" %}
+
+{% block content %}
+<div class="container">
+
+    <h1 class="page-title">Bet List</h1>
+
+    <!-- Form to create a new bet -->
+    <div class="form">
+        <h2>Create a New Bet</h2>
+        <form method="post" id="bet-form" action="{% url 'bet-list' %}">
+            {% csrf_token %}
+
+            <!-- Render the management form for the formset 
+            django will automatically render the necessary management fields such as
+            form-TOTAL_FORMS, form-INITIAL_FORMS, form-MIN_NUM_FORMS, form-MAX_NUM_FORMS
+            -->
+            {{ single_bet_forms.management_form }}
+
+            <!-- Display non-field errors for the bet_type_form -->
+            {% if bet_type_form.non_field_errors %}
+            <div class="errorList">
+                <p style="color: red">Error: Please select a bet type</p>
+            </div>
+            {% endif %}
+
+            <!-- Render the bet_type_form -->
+            {{ bet_type_form.as_p }}
+
+            <label for="id_bet_amount">Bet Amount:</label>
+            <input type="number" name="bet_amount" id="id_bet_amount" required step="0.01" placeholder="Enter your bet amount">
+
+            <!-- Errors for the formset -->
+            {% if single_bet_forms.non_form_errors %}
+            <div class="errorList">
+                <p style="color: red">Error: Please fill in information for all bets.</p>
+            </div>
+            {% endif %}
+
+            <!-- Errors when not fill out fields for SingleBets -->
+            <div id="single-bet-error-container">
+
+            </div>
+
+            <div id="single-bet-forms">
+                <!-- Placeholder for dynamically rendered forms -->
+            </div>
+            <button type="submit" class="btn-primary">Submit</button>
+        </form>
+    </div>
+    <hr>
+    
+
+    <!-- Form to filter displaying bets -->
+    <div class="bet-type-filter-form">
+        <form method="get" action="{% url 'bet-list' %}">
+            <fieldset>
+                <legend>Filter Bets by Type</legend>
+                <div class="form-inline">
+                    {{ bet_type_filter_form.as_p }}
+                    <button type="submit" class="btn btn-filter">Apply Filter</button>
+                    <button type="reset" class="btn btn-clear">Clear</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+
+    <!-- Form to trigger payout calculation -->
+    <div class="payout-button-container">
+        <form method="post" action="{% url 'calculate-payout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-calculate-payout">Calculate Payout</button>
+        </form>
+    </div>
+
+
+    <!-- Display all bets in a table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Bet Amount</th>
+                <th>Payout</th>
+                <th>Bet Type</th>
+                <th colspan="4">Details</th> <!-- 4 columns for maximum of legs -->
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bet in bets_flat %}
+            <tr class="table-row">
+                <td class="align-center">{{ bet.index }}</td>
+                <td>
+                    <a href="{% url 'player-detail' bet.player_id %}" class="player-name-link">
+                        {{ bet.player_name }}
+                    </a>
+                </td>
+                <td class="align-right">{{ bet.amount }}</td>
+                <!-- Display Payout -->
+                <td class="align-right">
+                    {% if bet.payout %}
+                        <span
+                         class="{% if bet.payout < 0 %}text-red{% else %}text-green{% endif %}">
+                         {{ bet.payout }}
+                        </span>
+                    {% else %}
+                        <span class="text-yellow">Pending</span>
+                    {% endif %}
+                </td>
+                <td class="align-center">{{ bet.bet_type }}</td>
+
+                <!-- Display Single Bets -->
+                <td>
+                    {% if bet.single_bet1 %}
+                        {{ bet.single_bet1.game }}<br>
+                        {% if bet.single_bet1.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet1.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet1.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet1.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet1.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+                
+                <td>
+                    {% if bet.single_bet2 %}
+                        {{ bet.single_bet2.game }}<br>
+                        {% if bet.single_bet2.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet2.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet2.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet2.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet2.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if bet.single_bet3 %}
+                        {{ bet.single_bet3.game }}<br>
+                        {% if bet.single_bet3.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet3.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet3.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet3.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet3.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if bet.single_bet4 %}
+                        {{ bet.single_bet4.game }}<br>
+                        {% if bet.single_bet4.single_bet_type == "WINNER" %}
+                            {{ bet.single_bet4.selected_team | upper }}  
+                        {% else %}
+                            {% if bet.single_bet4.is_over %}OVER {% else %}UNDER {% endif %} {{bet.single_bet4.game.over_under_points}}
+                        {% endif %}
+                        <br>
+                        <!-- Display Outcome -->
+                        {% with outcome=bet.single_bet4.determine_outcome %}
+                            {% if outcome == "Win" %}
+                                <small class="text-green">{{ outcome }}</small>
+                            {% elif outcome == "Loss" %}
+                                <small class="text-red">{{ outcome }}</small>
+                            {% elif outcome == "Tie" %}
+                                <small class="text-white">{{ outcome }}</small>
+                            {% else %}
+                                <small class="text-yellow">Pending</small>
+                            {% endif %}
+                        {% endwith %}
+                    {% else %}
+                        &nbsp;  <!-- Empty space for missing bets -->
+                    {% endif %}
+                </td>
+
+                <td>
+                    <!-- Form to delete the bet -->
+                    <form method="POST" action="{% url 'bet-list' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_bet_pk" value="{{ bet.bet_pk }}">
+                        <input type="hidden" name="delete_bet_type" value="{{  bet.bet_type }}">
+                        <button type="submit" class="sml-delete-btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+
+</div>
+
+<script id="games-data" type="application/json">
+    {{ games_json|safe }}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const betForm = document.getElementById("bet-form");
+
+    // Form Validation before submission
+    betForm.addEventListener("submit", function(event) {
+        console.log("Form submitted!");
+
+        let valid = true;
+        const errorList = document.getElementById('single-bet-error-container');
+        const singleBetForms = document.querySelectorAll('.single-bet-form');
+
+        // Clear previous errors
+        if (errorList) {
+            errorList.innerHTML = '';  // Clear previous error messages
+        }
+
+        singleBetForms.forEach((form, index) => {
+            const gameSelect = form.querySelector(`[name="single_bet_${index}_game"]`);
+            const betTypeSelect = form.querySelector(`[name="single_bet_${index}_single_bet_type"]`);
+            const selectedTeamInput = form.querySelector(`[name="single_bet_${index}_selected_team"]`);
+
+            // Check if game is selected
+            if (!gameSelect.value) {
+                valid = false;
+                errorList.innerHTML += `<p style="color: red">Error: Please select a game for Single Bet ${index + 1}</p>`;
+            }
+
+            // Check if bet type is selected
+            if (!betTypeSelect.value) {
+                valid = false;
+                errorList.innerHTML += `<p style="color: red">Error: Please select a bet type for Single Bet ${index + 1}</p>`;
+            }
+
+            // If bet type is WINNER, check if Selected Team is filled
+            if (betTypeSelect.value === "WINNER" && !selectedTeamInput.value) {
+                valid = false;
+                errorList.innerHTML += `<p style="color: red">Error: Please provide a Selected Team for Single Bet ${index + 1}</p>`;
+            }
+
+            // If bet type is OVER-UNDER, check if Selected Team is empty
+            if (betTypeSelect.value === "OVER-UNDER" && selectedTeamInput.value) {
+                valid = false;
+                errorList.innerHTML += `<p style="color: red">Error: Selected Team should be empty for Single Bet ${index + 1} with OVER-UNDER bet type</p>`;
+            }
+        });
+
+        if (!valid) {
+            event.preventDefault();  // Prevent form submission if invalid
+        }
+    });
+});
+
+    const games = JSON.parse(document.getElementById("games-data").textContent);
+
+    function updateForm() {
+        const betType = document.getElementById("id_bet_type").value;
+        const singleBetForms = document.getElementById("single-bet-forms");
+        const player = document.getElementById("id_player").value;
+        const errorList = document.querySelector('.errorList');
+
+        // Clear previous errors and forms
+        if (errorList) {
+            errorList.innerHTML = ''; // Remove errors
+        }
+
+        // Clear previous forms
+        singleBetForms.innerHTML = "";
+
+        let numForms = 0; // Default to 0
+
+        if (betType == "Straight") numForms = 1;
+        else if (betType === "Action") numForms = 2;
+        else if (betType === "Parlay3") numForms = 3;
+        else if (betType === "Parlay4") numForms = 4;
+
+        // Update TOTAL_FORMS to match the number of forms you are creating
+        // Update management fields only if they exist
+        // we need to do this because sometimes the JS run before the template is rendered
+        // and it causes errors
+        const totalFormsField = document.getElementById("id_form-TOTAL_FORMS");
+        const initialFormsField = document.getElementById("id_form-INITIAL_FORMS");
+        const minFormsField = document.getElementById("id_form-MIN_NUM_FORMS");
+        const maxFormsField = document.getElementById("id_form-MAX_NUM_FORMS");
+
+        if (totalFormsField) totalFormsField.value = numForms;
+        if (initialFormsField) initialFormsField.value = 0; // No initial forms
+        if (minFormsField) minFormsField.value = 1;  // Min forms required
+        if (maxFormsField) maxFormsField.value = 4;  // Max forms
+           
+
+        // Dynamically add SingleBet forms
+        for (let i = 0; i < numForms; i++) {
+            // Generate options for the game dropdown
+            let gameOptions = `<option value="">Pick a game</option>`;
+            games.forEach(game => {
+                gameOptions += `<option value="${game.id}">${game.name} (fav: -${game.fav_spread}, O/U: ${game.over_under_points})</option>`;
+            });
+
+            const formHtml = `
+                <div class="single-bet-form">
+                    <h4>Single Bet ${i + 1}</h4>
+                    <label for="id_single_bet_${i}_game">Game:</label>
+                    <select name="single_bet_${i}_game" id="id_single_bet_${i}_game">
+                        ${gameOptions}
+                    </select>
+
+                    <label for="id_single_bet_${i}_single_bet_type">Bet Type:</label>
+                    <select name="single_bet_${i}_single_bet_type" id="id_single_bet_${i}_single_bet_type">
+                        <option value="">Pick a bet type</option>
+                        <option value="WINNER">Winner</option>
+                        <option value="OVER-UNDER">Over-Under</option>
+                    </select>
+
+                    <label for="id_single_bet_${i}_selected_team">Selected Team:</label>
+                    <select name="single_bet_${i}_selected_team" id="id_single_bet_${i}_selected_team">
+                        <option value="">Pick a team</option>
+                    </select>
+
+                    <label for="id_single_bet_${i}_is_over">Over:</label>
+                    <input type="checkbox" name="single_bet_${i}_is_over" id="id_single_bet_${i}_is_over">
+                </div>
+            `;
+            singleBetForms.innerHTML += formHtml;
+
+        }
+
+        // need to render the single bet forms first, then we can add event listener to the selected game 
+        // on the single bet form
+        for (let i = 0; i < numForms; i++) {
+            // Populate the "Selected Team" dropdown based on the selected game
+            const gameSelect = document.getElementById(`id_single_bet_${i}_game`);
+            const teamSelect = document.getElementById(`id_single_bet_${i}_selected_team`);
+            const betTypeSelect = document.getElementById(`id_single_bet_${i}_single_bet_type`);
+            const overCheckbox = document.getElementById(`id_single_bet_${i}_is_over`);
+
+            gameSelect.addEventListener('change', () => {
+                const selectedGame = games.find(game => game.id == gameSelect.value);
+                teamSelect.innerHTML = `<option value="">Pick a team</option>`;
+                if (selectedGame) {
+                    teamSelect.innerHTML += `
+                        <option value="${selectedGame.team_a}">${selectedGame.team_a}</option>
+                        <option value="${selectedGame.team_b}">${selectedGame.team_b}</option>
+                    `;
+                }
+            });
+
+            // Handle Bet Type logic
+            betTypeSelect.addEventListener('change', () => {
+                if (betTypeSelect.value === "WINNER") {
+                    teamSelect.disabled = false; // Enable Selected Team
+                    overCheckbox.disabled = true; // Disable Over checkbox
+                    overCheckbox.checked = false; // Uncheck Over checkbox
+                } else if (betTypeSelect.value === "OVER-UNDER") {
+                    teamSelect.disabled = true; // Disable Selected Team
+                    teamSelect.value = ""; // Clear Selected Team value
+                    overCheckbox.disabled = false; // Enable Over checkbox
+                } else {
+                    // Default state when no valid bet type is selected
+                    teamSelect.disabled = true;
+                    overCheckbox.disabled = true;
+                    overCheckbox.checked = false;
+                    teamSelect.value = "";
+                }
+            });
+        }
+    }
+
+    // Event listeners for updating form based on bet type or player
+    document.getElementById("id_bet_type").addEventListener("change", updateForm);
+    document.getElementById("id_player").addEventListener("change", updateForm);
+</script>
+
+{% endblock %}

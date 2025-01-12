@@ -1,0 +1,50 @@
+{% extends "my_book/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Successfully Added Games</h1>
+    {% if saved_games %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Team A</th>
+                    <th>Team B</th>
+                    <th>Score A</th>
+                    <th>Score B</th>
+                    <th>Spread</th>
+                    <th>Over/ Under</th>
+                    <th>Favorite</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in saved_games %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ game.game_date }}</td>
+                    <td>
+                        <span class="team-name">{{ game.team_a }}</span> <br>
+                        <img src="{{ game.team_a_logo_url }}" alt="Team A Logo">
+                    </td>
+                    <td>
+                        <span class="team-name">{{ game.team_b }}</span> <br>
+                        <img src="{{ game.team_b_logo_url }}" alt="Team B Logo">
+                    </td>
+                    <td>{{ game.score_team_a|default:"-" }}</td>
+                    <td>{{ game.score_team_b|default:"-" }}</td>
+                    <td>{{ game.fav_spread|default:"-" }}</td>
+                    <td>{{ game.over_under_points|default:"-" }}</td>
+                    <td>{{ game.fav|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No games were added.</p>
+    {% endif %}
+    <div style="text-align: center;">
+        <a href="{% url 'game-list' %}" class="btn-primary">Back to Games List</a>
+    </div>
+</div>
+{% endblock %}
